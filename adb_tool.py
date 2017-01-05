@@ -5,8 +5,7 @@ Tool in Python to capture video/screenshots/build installation. Works with pytho
 
 import sys
 from datetime import datetime
-from subprocess import call
-
+from subprocess import call, check_output
 
 def time_diff(start, finish):
     """Runtime Calculator"""
@@ -47,15 +46,6 @@ print start_menu
 call(kill_server)
 call(start_server)
 call(devices)
-# while True:
-#     selection = raw_input("Do you want to proceed?(Y/N): ")
-#     if selection.lower() not in {'quit', 'y', 'n'}:
-#         print 'sorry, please provide valid selection'
-#         continue
-#     elif selection.lower() == 'no' or 'quit':
-#         sys.exit(0)
-#     else:
-#         break
 # =================================================
 
 # =============== ADB commands aliases ==============================
@@ -84,14 +74,15 @@ while True:
                   "Play to find out name of the app package."
                   "Press Enter to proceed.")
         app_package = raw_input("Please type in name of the package: ")
-        print "Clearing application data"
-        if app_package == call('adb shell pm list packages | grep %s' % app_package):
+        print "Clearing application data. Will pass if app is not found"
+        install_check = check_output('adb shell pm list packages | grep %s' % app_package)
+        if app_package in install_check:
             clear_data = 'adb shell pm clear %s' % app_package
             call(clear_data)
         else:
             pass
-        print "Uninstall existing build"
-        if app_package == call('adb shell pm list packages | grep %s' % app_package):
+        print "Uninstall existing build. Will pass if app is not found"
+        if app_package in install_check:
             uninstall = 'adb shell pm uninstall %s' %app_package
             call(uninstall)
         else:
@@ -104,6 +95,8 @@ while True:
         exit_script()
         if exit_script.text_exit.lower() == 'n':
             continue
+        else:
+            sys.exit(0)
 
     elif n == str(1):
         start_time = datetime.now()
@@ -123,6 +116,23 @@ while True:
                 break
             else:
                 sys.exit(0)
+    elif n == str(2):
+        start_time = datetime.now()
+        while True:
+            rec_name = raw_input("Please enter name of captured video. It will be timestamped automatically: ")
+            rec_name_timestamp = rec_name + datetime.strftime(datetime.today(), '%Y_%m_%d-%H_%M_%S') + '.mp4'
+            time_limit = raw_input("Please enter duration of the recording in seconds (Max=180): ")
+            print "Capturing video and uploading it to your folder"
+            make_video = 'adb shell screenrecord --time-limit %s /sdcard/%s && ' \
+                         'adb pull /sdcard/%s' % (time_limit, rec_name_timestamp, rec_name_timestamp)
+            call(make_video)
+            exit_script()
+            if exit_text == 'n':
+                continue
+            elif exit_script.text_exit.lower() == 'y':
+                break
+            else:
+                exit(0)
     elif n.lower() == 'quit':
         sys.exit(0)
     else:
