@@ -18,10 +18,14 @@ def exit_script():
     end_time = datetime.now()
     time_diff(start_time, end_time)
     exit_text = raw_input("Exit?(Y/N): ")
-    if exit_text.lower() == 'n':
-        sys.exit(0)
-    else:
-        pass
+    while True:
+        if exit_text.lower() not in {'y', 'n', 'quit'}:
+            print 'please provide valid selection'
+            continue
+        elif exit_text.lower() == 'y' or 'quit':
+            sys.exit(0)
+        else:
+            break
 
 # ============= START MENU ======================
 start_menu = """
@@ -35,16 +39,15 @@ Type 'quit' to exit script.
 -------------------------------------------------
 """
 print start_menu
-while True:
-    selection = raw_input("Do you want to proceed?(Y/N): ")
-    if selection.lower() not in {'quit', 'y', 'n'}:
-        print 'sorry, please provide valid selection'
-        continue
-    elif selection.lower() == 'y':
-        break
-    elif selection.lower() == 'no' or 'quit':
-        sys.exit(0)
-
+# while True:
+#     selection = raw_input("Do you want to proceed?(Y/N): ")
+#     if selection.lower() not in {'quit', 'y', 'n'}:
+#         print 'sorry, please provide valid selection'
+#         continue
+#     elif selection.lower() == 'no' or 'quit':
+#         sys.exit(0)
+#     else:
+#         break
 # =================================================
 
 # =============== ADB commands aliases ==============================
@@ -59,59 +62,58 @@ total_run_time = 0
 exit_text = ""
 # ====================================================================
 
+while True:
+    n = raw_input("Please input your selection: ")
+    if n == str(0):
+        start_time = datetime.now()
+        welcome_text_0 = """
+        ========================================================
+        === Welcome to the APK Installation Tool V.0.1 =========
+        ================ [Install Build via USB] ===============
+        ========================================================
 
-n = raw_input("Please input your selection: ")
-if n == str(0):
-    start_time = datetime.now()
-    welcome_text_0 = """
-    ========================================================
-    === Welcome to the APK Installation Tool V.0.1 =========
-    ================ [Install Build via USB] ===============
-    ========================================================
-
-    Connecting to device
-    """
-    print welcome_text_0
-    call(kill_server)
-    call(start_server)
-    call(devices)
-    raw_input("Type package name you wish to work with at prompt."
-              "You can download an Package Reader app from Google"
-              "Play to find out name of the app package."
-              "Press Enter to proceed.")
-    app_package = raw_input("Please type in name of the package: ")
-    print "Clearing application data"
-    if app_package == call('adb shell pm list packages | grep %s' % app_package):
-        clear_data = 'adb shell pm clear %s' % app_package
-        call(clear_data)
-    else:
-        pass
-    print "Uninstall existing build"
-    if app_package == call('adb shell pm list packages | grep %s' % app_package):
-        uninstall = 'adb shell pm uninstall %s' %app_package
-        call(uninstall)
-    else:
-        pass
-    apk_path = raw_input("Please provide full path to APK you wish to install on your computer: ")
-    print "APK will now install the build!"
-    call(wake)
-    install = 'adb install %s' % apk_path
-    call(install)
-    exit_script()
-
-
-elif n == str(1):
-    while True:
-        screenshot_name = raw_input('Enter screenshot name. It will be amended with timestamp automatically: ')
-        screenshot_timestamped = screenshot_name + datetime.strftime(datetime.today(), "%Y_%m_%d-%H_%M_%S") + '.png'
-        call('adb shell screencap /sdcard/%s && adb pull /sdcard/%s' % screenshot_timestamped)
-        exit_screencap = raw_input("Finished taking screenshots?(Y/N): ")
-        if exit_screencap.lower() == 'y':
-            break
+        Connecting to device
+        """
+        print welcome_text_0
+        call(kill_server)
+        call(start_server)
+        call(devices)
+        raw_input("Type package name you wish to work with at prompt."
+                  "You can download an Package Reader app from Google"
+                  "Play to find out name of the app package."
+                  "Press Enter to proceed.")
+        app_package = raw_input("Please type in name of the package: ")
+        print "Clearing application data"
+        if app_package == call('adb shell pm list packages | grep %s' % app_package):
+            clear_data = 'adb shell pm clear %s' % app_package
+            call(clear_data)
         else:
-            continue
-elif n.lower() == 'quit':
-    sys.exit(0)
-else:
-    print "Please type in valid selection"
+            pass
+        print "Uninstall existing build"
+        if app_package == call('adb shell pm list packages | grep %s' % app_package):
+            uninstall = 'adb shell pm uninstall %s' %app_package
+            call(uninstall)
+        else:
+            pass
+        apk_path = raw_input("Please provide full path to APK you wish to install on your computer: ")
+        print "APK will now install the build!"
+        call(wake)
+        install = 'adb install %s' % apk_path
+        call(install)
+        exit_script()
+
+    elif n == str(1):
+        start_time = datetime.now()
+        while True:
+            screenshot_name = raw_input('Enter screenshot name. It will be amended with timestamp automatically: ')
+            screenshot_timestamped = str(screenshot_name) + \
+                                     datetime.strftime(datetime.today(), "%Y_%m_%d-%H_%M_%S") + '.png'
+            make_screenshot = 'adb shell screencap /sdcard/%s' % screenshot_timestamped
+            call(make_screenshot)
+            call('adb pull /sdcard/%s' % screenshot_timestamped)
+            exit_script()
+    elif n.lower() == 'quit':
+        sys.exit(0)
+    else:
+        print "Please type in valid selection"
 
