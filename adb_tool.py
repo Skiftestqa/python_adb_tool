@@ -15,14 +15,15 @@ def time_diff(start, finish):
 
 
 def exit_script():
-    end_time = datetime.now()
-    time_diff(start_time, end_time)
-    exit_text = raw_input("Exit?(Y/N): ")
+    time_end = datetime.now()
+    time_diff(start_time, time_end)
+    exit_script.text_exit = raw_input("Exit?(Y/N): ")
     while True:
-        if exit_text.lower() not in {'y', 'n', 'quit'}:
+        if exit_script.text_exit.lower() not in {'y', 'n', 'quit'}:
             print 'please provide valid selection'
+            exit_script.text_exit = raw_input("Exit?(Y/N): ")
             continue
-        elif exit_text.lower() == 'y' or 'quit':
+        elif exit_script.text_exit.lower() == 'quit':
             sys.exit(0)
         else:
             break
@@ -37,8 +38,15 @@ Please choose an option below:
 -------------------------------------------------
 Type 'quit' to exit script.
 -------------------------------------------------
+Connecting to device
 """
+kill_server = 'adb kill-server'
+start_server = 'adb start-server'
+devices = 'adb devices'
 print start_menu
+call(kill_server)
+call(start_server)
+call(devices)
 # while True:
 #     selection = raw_input("Do you want to proceed?(Y/N): ")
 #     if selection.lower() not in {'quit', 'y', 'n'}:
@@ -51,9 +59,6 @@ print start_menu
 # =================================================
 
 # =============== ADB commands aliases ==============================
-kill_server = 'adb kill-server'
-start_server = 'adb start-server'
-devices = 'adb devices'
 wake = 'adb shell input keyevent KEYCODE_WAKEUP'
 notifications = 'adb shell service call statusbar 1'
 start_time = 0
@@ -72,12 +77,8 @@ while True:
         ================ [Install Build via USB] ===============
         ========================================================
 
-        Connecting to device
         """
         print welcome_text_0
-        call(kill_server)
-        call(start_server)
-        call(devices)
         raw_input("Type package name you wish to work with at prompt."
                   "You can download an Package Reader app from Google"
                   "Play to find out name of the app package."
@@ -101,6 +102,8 @@ while True:
         install = 'adb install %s' % apk_path
         call(install)
         exit_script()
+        if exit_script.text_exit.lower() == 'n':
+            continue
 
     elif n == str(1):
         start_time = datetime.now()
@@ -109,9 +112,17 @@ while True:
             screenshot_timestamped = str(screenshot_name) + \
                                      datetime.strftime(datetime.today(), "%Y_%m_%d-%H_%M_%S") + '.png'
             make_screenshot = 'adb shell screencap /sdcard/%s' % screenshot_timestamped
+            print "Taking a screenshot, please wait"
             call(make_screenshot)
+            print "pulling the file to your folder"
             call('adb pull /sdcard/%s' % screenshot_timestamped)
             exit_script()
+            if exit_script.text_exit.lower() == 'n':
+                continue
+            elif exit_script.text_exit.lower() == 'y':
+                break
+            else:
+                sys.exit(0)
     elif n.lower() == 'quit':
         sys.exit(0)
     else:
