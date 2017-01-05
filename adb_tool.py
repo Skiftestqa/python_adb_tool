@@ -4,7 +4,6 @@ Tool in Python to capture video/screenshots/build installation. Works with pytho
 """
 
 import sys
-
 from datetime import datetime
 from subprocess import call
 
@@ -24,7 +23,7 @@ def exit_script():
     else:
         pass
 
-# === START MENU ===
+# ============= START MENU ======================
 start_menu = """
 ================= Welcome========================
 Please choose an option below:
@@ -36,14 +35,17 @@ Type 'quit' to exit script.
 -------------------------------------------------
 """
 print start_menu
+while True:
+    selection = raw_input("Do you want to proceed?(Y/N): ")
+    if selection.lower() not in {'quit', 'y', 'n'}:
+        print 'sorry, please provide valid selection'
+        continue
+    elif selection.lower() == 'y':
+        break
+    elif selection.lower() == 'no' or 'quit':
+        sys.exit(0)
 
-selection = raw_input("Do you want to proceed?(Y/N): ")
-if selection.lower() == 'n' or 'quit':
-    sys.exit(0)
-elif selection.lower() == 'y':
-    pass
-
-# =================
+# =================================================
 
 # =============== ADB commands aliases ==============================
 kill_server = 'adb kill-server'
