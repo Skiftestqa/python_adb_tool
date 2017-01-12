@@ -60,7 +60,6 @@ exit_text = ""
 while True:
     n = raw_input("Please input your selection: ")
     if n == str(0):
-        start_time = datetime.now()
         welcome_text_0 = """
         ========================================================
         === Welcome to the APK Installation Tool V.0.1 =========
@@ -89,6 +88,7 @@ while True:
             pass
         apk_path = raw_input("Please provide full path to APK you wish to install on your computer: ")
         print "APK will now install the build!"
+        start_time = datetime.now()
         call(wake)
         install = 'adb install %s' % apk_path
         call(install)
@@ -99,13 +99,13 @@ while True:
             sys.exit(0)
 
     elif n == str(1):
-        start_time = datetime.now()
         while True:
             screenshot_name = raw_input('Enter screenshot name. It will be amended with timestamp automatically: ')
             screenshot_timestamped = str(screenshot_name) + \
                                      datetime.strftime(datetime.today(), "%Y_%m_%d-%H_%M_%S") + '.png'
             make_screenshot = 'adb shell screencap /sdcard/%s' % screenshot_timestamped
-            print "Taking a screenshot, please wait"
+            print "Taking a screenshot, please wait."
+            start_time = datetime.now()
             call(make_screenshot)
             print "pulling the file to your folder"
             call('adb pull /sdcard/%s' % screenshot_timestamped)
@@ -117,17 +117,20 @@ while True:
             else:
                 sys.exit(0)
     elif n == str(2):
-        start_time = datetime.now()
         while True:
-            rec_name = raw_input("Please enter name of captured video. It will be timestamped automatically: ")
+            rec_name = raw_input("If android version < 4.4.4, video can't be recorded. Otherwise please enter name of captured video. It will be timestamped automatically: ")
             rec_name_timestamp = rec_name + datetime.strftime(datetime.today(), '%Y_%m_%d-%H_%M_%S') + '.mp4'
             time_limit = raw_input("Please enter duration of the recording in seconds (Max=180): ")
-            print "Capturing video and uploading it to your folder"
-            make_video = 'adb shell screenrecord --time-limit %s /sdcard/%s && ' \
-                         'adb pull /sdcard/%s' % (time_limit, rec_name_timestamp, rec_name_timestamp)
+            print "Capturing video and uploading it to your folder."
+            make_video = 'adb shell screenrecord --time-limit %s /sdcard/%s' % (time_limit, rec_name_timestamp)
+            start_time = datetime.now()
+            print "capturing video..."
             call(make_video)
+            print "uploading video..."
+            pull_video = 'adb pull /sdcard/%s' % rec_name_timestamp
+            call(pull_video)
             exit_script()
-            if exit_text == 'n':
+            if exit_script.text_exit.lower() == 'n':
                 continue
             elif exit_script.text_exit.lower() == 'y':
                 break
