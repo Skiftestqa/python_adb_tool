@@ -101,7 +101,7 @@ while True:
     elif n == str(1):
         while True:
             screenshot_name = raw_input('Enter screenshot name. It will be amended with timestamp automatically: ')
-            screenshot_timestamped = str(screenshot_name) + \
+            screenshot_timestamped = screenshot_name + \
                                      datetime.strftime(datetime.today(), "%Y_%m_%d-%H_%M_%S") + '.png'
             make_screenshot = 'adb shell screencap /sdcard/%s' % screenshot_timestamped
             print "Taking a screenshot, please wait."
