@@ -73,14 +73,14 @@ while True:
                   "Play to find out name of the app package."
                   "Press Enter to proceed.")
         app_package = raw_input("Please type in name of the package: ")
-        print "Clearing application data. Will skip if app is not found"
+        print "Clearing application data. Will skip if app is not installed"
         install_check = check_output('adb shell pm list packages | grep %s' % app_package)
         if app_package in install_check:
             clear_data = 'adb shell pm clear %s' % app_package
             call(clear_data)
         else:
             pass
-        print "Uninstall existing build. Will skip if app is not found"
+        print "Uninstall existing build. Will skip if app is not installed"
         if app_package in install_check:
             uninstall = 'adb shell pm uninstall %s' %app_package
             call(uninstall)
