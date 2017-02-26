@@ -39,9 +39,9 @@ Type 'quit' to exit script.
 -------------------------------------------------
 Connecting to device
 """
-kill_server = 'adb kill-server'
-start_server = 'adb start-server'
-devices = 'adb devices'
+kill_server = ['adb', 'kill-server']
+start_server = ['adb', 'start-server']
+devices = ['adb', 'devices']
 print start_menu
 call(kill_server)
 call(start_server)
@@ -49,8 +49,8 @@ call(devices)
 # =================================================
 
 # =============== ADB commands aliases ==============================
-wake = 'adb shell input keyevent KEYCODE_WAKEUP'
-notifications = 'adb shell service call statusbar 1'
+wake = ['adb', 'shell', 'input', 'keyevent', 'KEYCODE_WAKEUP']
+notifications = ['adb', 'shell', 'service', 'call', 'statusbar', '1']
 start_time = 0
 end_time = 0
 total_run_time = 0
@@ -76,13 +76,13 @@ while True:
         print "Clearing application data. Will skip if app is not installed"
         install_check = check_output('adb shell pm list packages | grep %s' % app_package)
         if app_package in install_check:
-            clear_data = 'adb shell pm clear %s' % app_package
+            clear_data = ['adb', 'shell', 'pm', 'clear', app_package]
             call(clear_data)
         else:
             pass
         print "Uninstall existing build. Will skip if app is not installed"
         if app_package in install_check:
-            uninstall = 'adb shell pm uninstall %s' %app_package
+            uninstall = ['adb', 'shell', 'pm', 'uninstall', app_package]
             call(uninstall)
         else:
             pass
@@ -90,7 +90,7 @@ while True:
         print "APK will now install the build!"
         start_time = datetime.now()
         call(wake)
-        install = 'adb install %s' % apk_path
+        install = ['adb', 'install', apk_path]
         call(install)
         exit_script()
         if exit_script.text_exit.lower() == 'n':
@@ -103,12 +103,12 @@ while True:
             screenshot_name = raw_input('Enter screenshot name. It will be amended with timestamp automatically: ')
             screenshot_timestamped = screenshot_name + \
                                      datetime.strftime(datetime.today(), "%Y_%m_%d-%H_%M_%S") + '.png'
-            make_screenshot = 'adb shell screencap /sdcard/%s' % screenshot_timestamped
+            make_screenshot = ['adb', 'shell', 'screencap', '/sdcard/' + screenshot_timestamped]
             print "Taking a screenshot, please wait."
             start_time = datetime.now()
             call(make_screenshot)
-            print "pulling the file to your folder"
-            call('adb pull /sdcard/%s' % screenshot_timestamped)
+            print "Pulling the file to your folder..."
+            call(['adb', 'pull', '/sdcard/' + screenshot_timestamped])
             exit_script()
             if exit_script.text_exit.lower() == 'n':
                 continue
@@ -122,12 +122,12 @@ while True:
             rec_name_timestamp = rec_name + datetime.strftime(datetime.today(), '%Y_%m_%d-%H_%M_%S') + '.mp4'
             time_limit = raw_input("Please enter duration of the recording in seconds (Max=180): ")
             print "Capturing video and uploading it to your folder."
-            make_video = 'adb shell screenrecord --time-limit %s /sdcard/%s' % (time_limit, rec_name_timestamp)
+            make_video = ['adb', 'shell', 'screenrecord', '--time-limit', time_limit, '/sdcard/' + rec_name_timestamp]
             start_time = datetime.now()
             print "capturing video..."
             call(make_video)
             print "uploading video..."
-            pull_video = 'adb pull /sdcard/%s' % rec_name_timestamp
+            pull_video = ['adb', 'pull', '/sdcard/' + rec_name_timestamp]
             call(pull_video)
             exit_script()
             if exit_script.text_exit.lower() == 'n':
