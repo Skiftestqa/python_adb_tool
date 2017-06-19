@@ -3,14 +3,15 @@
 Tool in Python to capture video/screenshots/build installation. Works with python 2.7
 """
 
-import sys
+from __future__ import print_function
 from datetime import datetime
 from subprocess import call, check_output
+import sys
 
 def time_diff(start, finish):
     """Runtime Calculator"""
 
-    print "Run in %s" % (finish - start)
+    print ("Run in %s" % (finish - start))
 
 
 def exit_script():
@@ -19,7 +20,7 @@ def exit_script():
     exit_script.text_exit = raw_input("Exit?(Y/N): ")
     while True:
         if exit_script.text_exit.lower() not in {'y', 'n', 'quit'}:
-            print 'please provide valid selection'
+            print ('please provide valid selection')
             exit_script.text_exit = raw_input("Exit?(Y/N): ")
             continue
         elif exit_script.text_exit.lower() == 'quit':
@@ -42,7 +43,7 @@ Connecting to device
 kill_server = ['adb', 'kill-server']
 start_server = ['adb', 'start-server']
 devices = ['adb', 'devices']
-print start_menu
+print (start_menu)
 call(kill_server)
 call(start_server)
 call(devices)
@@ -67,27 +68,30 @@ while True:
         ========================================================
 
         """
-        print welcome_text_0
+        print (welcome_text_0)
         raw_input("Type package name you wish to work with at prompt."
-                  "You can download an Package Reader app from Google"
+                  " Enter the command in terminal to list all packages available and then narrow results by grepping:"
+                  " [adb shell pm list packages | grep <your word to narrow down search>]"
+                  " Pacakge name starts with 'com.'"
+                  " Alternatively you can download an Package Reader app from Google"
                   "Play to find out name of the app package."
                   "Press Enter to proceed.")
         app_package = raw_input("Please type in name of the package: ")
-        print "Clearing application data. Will skip if app is not installed"
+        print ("Clearing application data. Will skip if app is not installed")
         install_check = check_output('adb shell pm list packages | grep %s' % app_package)
         if app_package in install_check:
             clear_data = ['adb', 'shell', 'pm', 'clear', app_package]
             call(clear_data)
         else:
             pass
-        print "Uninstall existing build. Will skip if app is not installed"
+        print ("Uninstall existing build. Will skip if app is not installed")
         if app_package in install_check:
             uninstall = ['adb', 'shell', 'pm', 'uninstall', app_package]
             call(uninstall)
         else:
             pass
         apk_path = raw_input("Please provide full path to APK you wish to install on your computer: ")
-        print "APK will now install the build!"
+        print ("APK will now install the build!")
         start_time = datetime.now()
         call(wake)
         install = ['adb', 'install', apk_path]
@@ -104,10 +108,10 @@ while True:
             screenshot_timestamped = screenshot_name + \
                                      datetime.strftime(datetime.today(), "%Y_%m_%d-%H_%M_%S") + '.png'
             make_screenshot = ['adb', 'shell', 'screencap', '/sdcard/' + screenshot_timestamped]
-            print "Taking a screenshot, please wait."
+            print ("Taking a screenshot, please wait.")
             start_time = datetime.now()
             call(make_screenshot)
-            print "Pulling the file to your folder..."
+            print ("Pulling the file to your folder...")
             call(['adb', 'pull', '/sdcard/' + screenshot_timestamped])
             exit_script()
             if exit_script.text_exit.lower() == 'n':
@@ -121,12 +125,12 @@ while True:
             rec_name = raw_input("If android version < 4.4.4, video can't be recorded. Otherwise please enter name of captured video. It will be timestamped automatically: ")
             rec_name_timestamp = rec_name + datetime.strftime(datetime.today(), '%Y_%m_%d-%H_%M_%S') + '.mp4'
             time_limit = raw_input("Please enter duration of the recording in seconds (Max=180): ")
-            print "Capturing video and uploading it to your folder."
+            print ("Capturing video and uploading it to your folder.")
             make_video = ['adb', 'shell', 'screenrecord', '--time-limit', time_limit, '/sdcard/' + rec_name_timestamp]
             start_time = datetime.now()
-            print "capturing video..."
+            print ("capturing video...")
             call(make_video)
-            print "uploading video..."
+            print ("uploading video...")
             pull_video = ['adb', 'pull', '/sdcard/' + rec_name_timestamp]
             call(pull_video)
             exit_script()
@@ -139,5 +143,5 @@ while True:
     elif n.lower() == 'quit':
         sys.exit(0)
     else:
-        print "Please type in valid selection"
+        print ("Please type in valid selection")
 
