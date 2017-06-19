@@ -69,22 +69,23 @@ while True:
 
         """
         print (welcome_text_0)
-        raw_input("Type package name you wish to work with at prompt."
-                  " Enter the command in terminal to list all packages available and then narrow results by grepping:"
-                  " [adb shell pm list packages | grep <your word to narrow down search>]"
-                  " Pacakge name starts with 'com.'"
-                  " Alternatively you can download an Package Reader app from Google"
-                  "Play to find out name of the app package."
-                  "Press Enter to proceed.")
+        raw_input("""
+        Type package name you wish to work with at prompt. To find package name =>
+        Enter the command in terminal to list all packages available and then narrow results by grepping:
+        [adb shell pm list packages | grep <your word to narrow down search>]
+        Pacakge name starts with 'com.'
+        Alternatively you can download a Package Reader app from Google Play to find out name of the app package.
+        Press Enter to proceed.
+        """)
         app_package = raw_input("Please type in name of the package: ")
         print ("Clearing application data. Will skip if app is not installed")
-        install_check = check_output('adb shell pm list packages | grep %s' % app_package)
+        install_check = check_output(['adb', 'shell', 'pm', 'list', 'packages', ' | grep', app_package])
         if app_package in install_check:
             clear_data = ['adb', 'shell', 'pm', 'clear', app_package]
             call(clear_data)
         else:
             pass
-        print ("Uninstall existing build. Will skip if app is not installed")
+        print ("Uninstalling existing build. Will skip if app is not installed")
         if app_package in install_check:
             uninstall = ['adb', 'shell', 'pm', 'uninstall', app_package]
             call(uninstall)
