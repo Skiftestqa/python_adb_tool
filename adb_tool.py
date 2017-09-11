@@ -1,11 +1,13 @@
 #! /usr/bin/env python
 """
-Tool in Python to capture video/screenshots/build installation. Works with python 2.7
+Tool in Python to capture video/screenshots, for build installation and logcat capture. Works with python 2.7 and up.
+Works on OSX, Windows, should work on Linux as well.
 """
 
 from __future__ import print_function
 from datetime import datetime
-from subprocess import call, check_output
+from subprocess import call, check_output, Popen, PIPE
+from os import path
 import sys
 
 def time_diff(start, finish):
@@ -35,6 +37,7 @@ Please choose an option below:
 0) Install build via USB connection
 1) Capture a screenshot
 2) Capture a video (Requires 4.4 firmware and up)
+3) Record logs to a file
 -------------------------------------------------
 Type 'quit' to exit script.
 -------------------------------------------------
@@ -73,7 +76,7 @@ while True:
         Type package name you wish to work with at prompt. To find package name =>
         Enter the command in terminal to list all packages available and then narrow results by grepping:
         [adb shell pm list packages | grep <your word to narrow down search>]
-        Pacakge name starts with 'com.'
+        Package name starts with 'com.'
         Alternatively you can download a Package Reader app from Google Play to find out name of the app package.
         Press Enter to proceed.
         """)
@@ -106,8 +109,8 @@ while True:
     elif n == str(1):
         while True:
             screenshot_name = raw_input('Enter screenshot name. It will be amended with timestamp automatically: ')
-            screenshot_timestamped = screenshot_name + \
-                                     datetime.strftime(datetime.today(), "%Y_%m_%d-%H_%M_%S") + '.png'
+            screenshot_timestamped = screenshot_name.replace(" ", "_") + \
+                                     datetime.strftime(datetime.today(), "_%Y_%m_%d-%H_%M_%S") + '.png'
             make_screenshot = ['adb', 'shell', 'screencap', '/sdcard/' + screenshot_timestamped]
             print ("Taking a screenshot, please wait.")
             start_time = datetime.now()
@@ -124,7 +127,7 @@ while True:
     elif n == str(2):
         while True:
             rec_name = raw_input("If android version < 4.4.4, video can't be recorded. Otherwise please enter name of captured video. It will be timestamped automatically: ")
-            rec_name_timestamp = rec_name + datetime.strftime(datetime.today(), '%Y_%m_%d-%H_%M_%S') + '.mp4'
+            rec_name_timestamp = rec_name.replace(" ", "_") + datetime.strftime(datetime.today(), '_%Y_%m_%d-%H_%M_%S') + '.mp4'
             time_limit = raw_input("Please enter duration of the recording in seconds (Max=180): ")
             print ("Capturing video and uploading it to your folder.")
             make_video = ['adb', 'shell', 'screenrecord', '--time-limit', time_limit, '/sdcard/' + rec_name_timestamp]
@@ -135,6 +138,41 @@ while True:
             pull_video = ['adb', 'pull', '/sdcard/' + rec_name_timestamp]
             call(pull_video)
             exit_script()
+            if exit_script.text_exit.lower() == 'n':
+                continue
+            elif exit_script.text_exit.lower() == 'y':
+                break
+            else:
+                exit(0)
+    elif n == str(3):
+        while True:
+            raw_input("""
+                    Type package name you wish to work with at prompt. To find package name =>
+                    Enter the command in terminal to list all packages available and then narrow results by grepping:
+                    [adb shell pm list packages | grep <your word to narrow down search>]
+                    Package name starts with 'com.'
+                    Alternatively you can download a Package Reader app from Google Play to find out name of the app package.
+                    Press Enter to proceed.
+                    """)
+            app_package = raw_input("Please type in name of the package: ")
+            file_name = raw_input("Please type name for file you want to create to record logs in: ")
+            file_name_timestamped = file_name.replace(" ", "_") + datetime.strftime(datetime.today(), "_%Y_%m_%d-%H_%M_%S") + '.txt'
+            file_path = path.join(path.dirname(path.abspath(__file__)), file_name_timestamped)
+            cmd_ps = ['adb', 'shell', 'ps', '|', 'grep', app_package, '|', 'cut', '-c', '11-15']
+            ps_id = check_output(cmd_ps, universal_newlines=True).strip()
+            raw_input("Please press Enter when you are ready to start recording logs. To Stop recording press 'Ctrl + C' key combination.")
+            start_time = datetime.now()
+            print(ps_id)
+            ps = Popen(['adb', 'logcat'], stdout=PIPE, universal_newlines=True)
+            try:
+                with open(file_path, 'a') as f:
+                    while True:
+                        for line in ps.stdout:
+                            if ps_id in line:
+                                sys.stdout.write(line)
+                                f.write(line)
+            except KeyboardInterrupt:
+                exit_script()
             if exit_script.text_exit.lower() == 'n':
                 continue
             elif exit_script.text_exit.lower() == 'y':
